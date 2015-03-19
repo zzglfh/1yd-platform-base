@@ -8,6 +8,10 @@
          http://www.springframework.org/schema/beans/spring-beans.xsd
          http://www.springframework.org/schema/context
          http://www.springframework.org/schema/context/spring-context.xsd
+         
+          http://www.springframework.org/schema/jdbc
+          http://www.springframework.org/schema/jdbc/spring-jdbc-3.2.xsd
+          
          http://www.springframework.org/schema/cache
          http://www.springframework.org/schema/cache/spring-cache-3.1.xsd">
 
@@ -26,11 +30,13 @@
 		p:removeAbandonedTimeout="60"
 		p:jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer" />
 
-	<!-- Database initializer. If any of the script fails, the initialization 
-		stops. -->
-	<!-- As an alternative, for embedded databases see <jdbc:embedded-database/>. 
-		<jdbc:initialize-database data-source="dataSource"> <jdbc:script location="${jdbc.initLocation}"/> 
-		<jdbc:script location="${jdbc.dataLocation}"/> </jdbc:initialize-database> -->
+	
+    <!-- Database initializer. If any of the script fails, the initialization stops. -->
+    <!-- As an alternative, for embedded databases see <jdbc:embedded-database/>. -->
+    <jdbc:initialize-database  data-source="dataSource">
+        <jdbc:script encoding="utf-8" location="${jdbc.initLocation}"/>
+        <jdbc:script encoding="utf-8" location="${jdbc.dataLocation}"/>
+    </jdbc:initialize-database>
 
 	<!-- Configurer that replaces ${...} placeholders with values from a properties 
 		file -->
