@@ -1,0 +1,12 @@
+1yd0base0test:
+   build: /root/1yd-base/
+   volumes:
+      - /logs/base-test:/logs
+   ports:
+      - "8088:8080"
+   environment:
+      NEW_RELIC_APP_NAME: 1yd-base-test
+      jdbc.url: jdbc:mysql://10.10.16.127:3306/base-test?useUnicode=true&amp;characterEncoding=utf-8
+      jdbc.username: develop
+      jdbc.password: hqMvjcJCQQdYEtc6
+      profiles.active: release
