@@ -1,7 +1,7 @@
 # 1yd-platform-base
 #dir
-mkdir /code/1yd-base
-cd /code/1yd-base
+mkdir /code/1yd-base  
+cd /code/1yd-base  
 
 # get  code
 git clone git@github.com:tianjiancloud/1yd-platform-base.git
