@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Repository and Service layers -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+
+
+		http://www.springframework.org/schema/security 
+		http://www.springframework.org/schema/security/spring-security-3.2.xsd
+		http://www.springframework.org/schema/security/oauth2 
+		http://www.springframework.org/schema/security/spring-security-oauth2-2.0.xsd">
+	<!-- For S2OAuth endpoints -->
+	<http pattern="/oauth/token" create-session="stateless"
+		authentication-manager-ref="clientAuthenticationManager"
+		entry-point-ref="oauthAuthenticationEntryPoint" xmlns="http://www.springframework.org/schema/security">
+		<intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY"
+			method="POST" />
+		<anonymous enabled="false" />
+		<http-basic entry-point-ref="oauthAuthenticationEntryPoint" />
+		<!-- include this only if you need to authenticate clients via request 
+			parameters -->
+		<custom-filter ref="clientCredentialsTokenEndpointFilter"
+			before="BASIC_AUTH_FILTER" />
+	</http>
+
+	<http auto-config='true' pattern="/**" create-session="never"
+		entry-point-ref="oauthAuthenticationEntryPoint"
+		access-decision-manager-ref="accessDecisionManager"
+		xmlns="http://www.springframework.org/schema/security">
+		<!-- Allow anonymously user for register -->
+		<intercept-url pattern='/api/users' method="POST"
+			access="IS_AUTHENTICATED_ANONYMOUSLY" />
+
+		<!-- Disable the security check for CORS -->
+		<intercept-url pattern='/**' access="IS_AUTHENTICATED_ANONYMOUSLY"
+			method="OPTIONS" />
+
+		<!-- Allow weixin service or alipay service -->
+		<intercept-url pattern='/api/alipay/do_return' access="IS_AUTHENTICATED_ANONYMOUSLY"
+			method="GET" />
+		<intercept-url pattern='/api/weixin/**' access="IS_AUTHENTICATED_ANONYMOUSLY" />
+
+		<intercept-url pattern='/api/weixin_payments' access="IS_AUTHENTICATED_ANONYMOUSLY"
+			method="POST" />
+		<intercept-url pattern='/api/weixin_payments/notify_result'
+			access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<intercept-url pattern='/api/weixin_auth' access="IS_AUTHENTICATED_ANONYMOUSLY"
+			method="POST" />
+		<intercept-url pattern='/api/alipay/do_return' access="IS_AUTHENTICATED_ANONYMOUSLY"
+			method="GET" />
+		<intercept-url pattern='/api/alipay/do_notify' access="IS_AUTHENTICATED_ANONYMOUSLY"
+			method="POST" />
+		<intercept-url pattern='/api/alipay/do_notify_rsa'
+			access="IS_AUTHENTICATED_ANONYMOUSLY" method="POST" />
+
+		<intercept-url pattern='/api/coaches/**' access="IS_AUTHENTICATED_ANONYMOUSLY" />
+
+		<intercept-url pattern='/api/coaches/**' access="IS_AUTHENTICATED_ANONYMOUSLY"
+			method="GET" />
+		<intercept-url pattern='/api/stadiums/**' access="IS_AUTHENTICATED_ANONYMOUSLY"
+			method="GET" />
+		<intercept-url pattern='/api/coaches/**' access="IS_AUTHENTICATED_ANONYMOUSLY"
+			method="GET" />
+		<intercept-url pattern='/api/users/**' access="IS_AUTHENTICATED_ANONYMOUSLY"
+			method="GET" />
+		<!-- validate url is anonymously -->
+		<intercept-url pattern='/api/sms_validate_codes/**'
+			access="IS_AUTHENTICATED_ANONYMOUSLY" />
+		<intercept-url pattern='/api/email_validate_code/**'
+			access="IS_AUTHENTICATED_ANONYMOUSLY" />
+
+
+
+		<intercept-url pattern='/api/admin/**' access="ROLE_ADMIN" />
+		<!-- Allow anonymously user for other operations -->
+		<intercept-url pattern='/api/**' access="IS_AUTHENTICATED_ANONYMOUSLY" />
+
+
+
+		<custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
+		<access-denied-handler ref="oauthAccessDeniedHandler" />
+	</http>
+
+	<oauth:authorization-server
+		client-details-service-ref="clientDetailsService" token-services-ref="tokenServices"
+		user-approval-handler-ref="oauthUserApprovalHandler">
+		<oauth:refresh-token />
+		<oauth:password />
+	</oauth:authorization-server>
+
+	<bean id="oauthAuthenticationEntryPoint"
+		class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+	</bean>
+
+	<bean id="clientAuthenticationEntryPoint"
+		class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+	</bean>
+
+	<bean id="oauthAccessDeniedHandler"
+		class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler">
+	</bean>
+
+	<bean id="oauthUserApprovalHandler"
+		class="org.springframework.security.oauth2.provider.approval.DefaultUserApprovalHandler" />
+
+	<bean id="clientCredentialsTokenEndpointFilter"
+		class="org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter">
+		<property name="authenticationManager" ref="clientAuthenticationManager" />
+	</bean>
+
+	<!-- Client Authentication Config -->
+	<!-- <bean id="clientAuthenticationManager" class="org.springframework.security.authentication.ProviderManager"> 
+		<constructor-arg> <list> <ref bean="customAuthenticationProvider" /> <ref 
+		bean="wxAuthenticationProvider" /> </list> </constructor-arg> </bean> -->
+
+
+
+
+
+	<bean id="customAuthenticationProvider"
+		class="com.tjcloud.platform.utils.service.CustomAuthenticationProvider">
+	</bean>
+
+
+	<bean id="wxAuthenticationProvider"
+		class="com.tjcloud.platform.utils.service.WxAuthenticationProvider">
+	</bean>
+
+
+
+
+	<bean id="clientDetailsUserService"
+		class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+		<constructor-arg ref="clientDetailsService" />
+	</bean>
+
+	<oauth:client-details-service id="clientDetailsService">
+		<!-- Allow access to test clients -->
+		<oauth:client client-id="{sys.token.client.id}"
+			secret="286924697e615a672a646a493545646c" authorized-grant-types="password,refresh_token"
+			authorities="ROLE_USER" access-token-validity="${sys.token.time.out}" autoapprove="true"
+			refresh-token-validity="${sys.token.time.out}" scope="read, write" />
+
+		<!-- Web Application clients -->
+		<oauth:client client-id="7b5a38705d7b3562655925406a652e32"
+			secret="655f523128212d6e70634446224c2a48" authorized-grant-types="password,refresh_token"
+			authorities="ROLE_WEB" access-token-validity="${sys.token.time.out}"
+			refresh-token-validity="${sys.token.time.out}" />
+
+	</oauth:client-details-service>
+
+	<bean id="passwordEncoder"
+		class="com.tjcloud.platform.utils.service.UserPasswordSaltSource">
+	</bean>
+
+	<!-- User Authentication Config -->
+	<bean id="userDetailsService"
+		class="com.tjcloud.platform.utils.service.UserDetailsServiceImpl" />
+
+	<authentication-manager alias="authenticationManager"
+		xmlns="http://www.springframework.org/schema/security">
+		<authentication-provider user-service-ref="userDetailsService">
+			<password-encoder hash="sha">
+				<sec:salt-source ref="passwordEncoder" />
+			</password-encoder>
+		</authentication-provider>
+
+		<authentication-provider ref="wxAuthenticationProvider" />
+		<authentication-provider ref="customAuthenticationProvider" />
+
+	</authentication-manager>
+
+
+	<!-- <authentication-manager alias="authenticationManager" xmlns="http://www.springframework.org/schema/security"> 
+		<authentication-provider user-service-ref="userDetailsService"> <password-encoder 
+		hash="sha"> <sec:salt-source ref="passwordEncoder" /> </password-encoder> 
+		</authentication-provider> <authentication-provider ref="wxAuthenticationProvider" 
+		/> </authentication-manager> -->
+	<authentication-manager id="clientAuthenticationManager"
+		xmlns="http://www.springframework.org/schema/security">
+
+		<sec:authentication-provider
+			user-service-ref="clientDetailsUserService" />
+
+
+	</authentication-manager>
+
+
+	<!-- Used for the persistenceof tokens (currently an in memory implementation) -->
+	<bean id="tokenStore"
+		class="org.springframework.security.oauth2.provider.token.store.JdbcTokenStore">
+		<constructor-arg ref="dataSource"></constructor-arg>
+	</bean>
+
+	<!-- Used to create token and and every thing about them except for their 
+		persistence that is reposibility of TokenStore (Given here is a default implementation) -->
+	<bean id="tokenServices"
+		class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
+		<property name="tokenStore" ref="tokenStore" />
+		<property name="supportRefreshToken" value="true" />
+		<property name="accessTokenValiditySeconds" value="300000"></property>
+		<property name="clientDetailsService" ref="clientDetailsService" />
+	</bean>
+	<oauth:resource-server id="resourceServerFilter"
+		token-services-ref="tokenServices" />
+	<sec:global-method-security
+		pre-post-annotations="enabled" proxy-target-class="true">
+		<!--you could also wire in the expression handler up at the layer of the 
+			http filters. See https://jira.springsource.org/browse/SEC-1452 -->
+		<sec:expression-handler ref="oauthExpressionHandler" />
+	</sec:global-method-security>
+
+	<oauth:expression-handler id="oauthExpressionHandler" />
+
+	<oauth:web-expression-handler id="oauthWebExpressionHandler" />
+	<bean id="accessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased"
+		xmlns="http://www.springframework.org/schema/beans">
+		<constructor-arg>
+			<list>
+				<bean class="org.springframework.security.oauth2.provider.vote.ScopeVoter" />
+				<bean class="org.springframework.security.access.vote.RoleVoter" />
+				<bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+</beans>
