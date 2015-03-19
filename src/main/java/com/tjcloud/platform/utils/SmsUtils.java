@@ -3,6 +3,7 @@ package com.tjcloud.platform.utils;
 import com.tianjiancloud.exception.CommonException;
 import com.tianjiancloud.exception.ExceptionCode;
 import com.tjcloud.platform.constant.Constant;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
@@ -11,6 +12,7 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -21,16 +23,20 @@ import java.util.Map.Entry;
 
 @Component
 public class SmsUtils {
+	
+	@Value("${sms.username}")
+	private static String userName ; // 接口账号
+	@Value("${sms.password}")
+	private static String password ; // 密码
+	@Value("${sms.url}")
+	private static String url; // 三网通使用地址
 
-	private static String userName = PropertiesReaderUtils.getProperty("sms.username"); // 接口账号
-	private static String password = PropertiesReaderUtils.getProperty("sms.password"); // 密码
 	private static String content = "[我要运动]，您本次手机验证码为: "; // 短信内容
 	private static String sign = ""; // 短信签名，该签名必须提前报备
 	private static String msgid = ""; // 自定义msgid
 	private static String subcode = ""; // 扩展字号
 	private static String sendtime = ""; // 定时发送时间，时间格式201305051230
-	private static String url = PropertiesReaderUtils.getProperty("sms.url"); // 三网通使用地址
-
+	
 	// MD5加密函数
 	private static String MD5Encode(String sourceString) {
 		String resultString = null;

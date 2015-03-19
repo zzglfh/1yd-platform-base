@@ -132,6 +132,9 @@
 		<context:property-placeholder
 			location="classpath:spring/databases/local-data-access.properties"
 			system-properties-mode="OVERRIDE" />
+		<context:property-placeholder
+			location="classpath:spring/databases/local-data-access.properties"
+			system-properties-mode="OVERRIDE" />
 	</beans>
 
 	<beans profile="develop">
