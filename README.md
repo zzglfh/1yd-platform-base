@@ -18,6 +18,9 @@ mvn install
 
 fig up
 
+# look
+http://localhost:8080/1yd-base/test?name=test
+
 #config
 1.遵守spring变量查找规则，首先查找环境变量的值，在查询jvm中的值，最后查找配置文件的值
   因此你可以更改配置在fig.yml(基于docker运行的时候) ,环境变量，jvm ,配置文件
