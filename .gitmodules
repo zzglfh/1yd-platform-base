@@ -1,6 +1,3 @@
-[submodule "exception"]
-	path = exception
-	url = https://git.oschina.net/itShine/Common-Exception-Desgin.git
 [submodule "util"]
 	path = util
 	url = git@github.com:tianjiancloud/1yd-platfrom-utils.git
