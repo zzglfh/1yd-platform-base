@@ -1,14 +1,16 @@
 package com.tjcloud.platform.controller;
 
-import com.tianjiancloud.exception.CommonException;
-import com.tianjiancloud.exception.ExceptionCode;
-import com.tianjiancloud.exception.model.ErrorModel;
+import com.tjcloud.exception.CommonException;
+import com.tjcloud.exception.ExceptionCode;
+import com.tjcloud.exception.model.ErrorModel;
 import com.tjcloud.platform.component.BaseComponent;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 

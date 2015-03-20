@@ -1,7 +1,7 @@
 package com.tjcloud.platform.utils;
 
-import com.tianjiancloud.exception.CommonException;
-import com.tianjiancloud.exception.ExceptionCode;
+import com.tjcloud.exception.CommonException;
+import com.tjcloud.exception.ExceptionCode;
 import com.tjcloud.platform.constant.Constant;
 
 import org.apache.commons.httpclient.HttpClient;
